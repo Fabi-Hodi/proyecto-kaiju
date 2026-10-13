@@ -2,41 +2,86 @@ package com.example.appkaiju_grupo10.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.appkaiju_grupo10.R
+import com.example.appkaiju_grupo10.navigation.Screen
 import com.example.appkaiju_grupo10.ui.utils.obtenerWindowSizeClass
+import com.example.appkaiju_grupo10.viewmodels.MainViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-// DECIDE QUE PANTALLA MOSTRAR
+//EL CEREBRO AHORA INCLUYE EL MENÚ LATERAL
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenAdaptativa() {
+fun HomeScreen(
+    navController: NavController,
+    viewModel: MainViewModel
+) {
     val windowSizeClass = obtenerWindowSizeClass()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-    when (windowSizeClass.widthSizeClass) {
-        WindowWidthSizeClass.Compact -> HomeScreenCompacta()
-        WindowWidthSizeClass.Medium -> HomeScreenMediana()
-        WindowWidthSizeClass.Expanded -> HomeScreenExpandida()
+    // el menu lateral envuelve toda la pantalla
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                Text(text = "Menú Kaiju", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleLarge)
+                NavigationDrawerItem(
+                    label = { Text(text = "Ir a Perfil") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        viewModel.navigateTo(Screen.Profile)
+                    }
+                )
+            }
+        }
+    ) {
+        // Aquí decidimos que diseño mostrar, pero ahora le pasamos las herramientas de navegación
+        when (windowSizeClass.widthSizeClass) {
+            WindowWidthSizeClass.Compact -> HomeScreenCompacta(viewModel, drawerState, scope)
+            WindowWidthSizeClass.Medium -> HomeScreenMediana(viewModel, drawerState, scope)
+            WindowWidthSizeClass.Expanded -> HomeScreenExpandida(viewModel, drawerState, scope)
+        }
     }
 }
 
-// DISEÑO PARA CELULARES (Compacta)
+//DISEÑO PARA CELULARES
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenCompacta() {
+fun HomeScreenCompacta(viewModel: MainViewModel, drawerState: DrawerState, scope: CoroutineScope) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Kaiju - Celular") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("Kaiju - Celular") },
+                navigationIcon = {
+                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                        Icon(imageVector = Icons.Default.Menu, contentDescription = "Menú")
+                    }
+                }
+            )
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding).fillMaxSize().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("¡Bienvenido a Kaiju!", style = MaterialTheme.typography.titleLarge)
-            Button(onClick = { }) { Text("Presióname") }
+            Button(onClick = { viewModel.navigateTo(Screen.Settings) }) {
+                Text("Ir a Configuración")
+            }
             Image(
                 painter = painterResource(id = R.drawable.icono_kaiju),
                 contentDescription = "Logo App",
@@ -47,20 +92,32 @@ fun HomeScreenCompacta() {
     }
 }
 
-// DISEÑO PARA TABLETS PEQUEÑAS (Mediana)
+//DISEÑO PARA TABLETS PEQUEÑAS
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenMediana() {
+fun HomeScreenMediana(viewModel: MainViewModel, drawerState: DrawerState, scope: CoroutineScope) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Kaiju - Tablet Pequeña") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("Kaiju - Tablet Pequeña") },
+                navigationIcon = {
+                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                        Icon(imageVector = Icons.Default.Menu, contentDescription = "Menú")
+                    }
+                }
+            )
+        }
     ) { innerPadding ->
-        Row( // Usamos Row para poner el texto y la imagen uno al lado del otro
+        Row(
             modifier = Modifier.padding(innerPadding).fillMaxSize().padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(20.dp)) {
                 Text("¡Bienvenido a Kaiju!", style = MaterialTheme.typography.titleLarge)
-                Button(onClick = { }) { Text("Presióname") }
+                Button(onClick = { viewModel.navigateTo(Screen.Settings) }) {
+                    Text("Ir a Configuración")
+                }
             }
             Image(
                 painter = painterResource(id = R.drawable.icono_kaiju),
@@ -71,19 +128,31 @@ fun HomeScreenMediana() {
     }
 }
 
-// DISEÑO PARA TABLETS GRANDES O PC (Expandida)
+//DISEÑO PARA TABLETS GRANDES O PC
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenExpandida() {
+fun HomeScreenExpandida(viewModel: MainViewModel, drawerState: DrawerState, scope: CoroutineScope) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Kaiju - Pantalla Gigante") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("Kaiju - Pantalla Gigante") },
+                navigationIcon = {
+                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                        Icon(imageVector = Icons.Default.Menu, contentDescription = "Menú")
+                    }
+                }
+            )
+        }
     ) { innerPadding ->
         Row(
             modifier = Modifier.padding(innerPadding).fillMaxSize().padding(32.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Vista expandida para Kaiju", style = MaterialTheme.typography.headlineLarge)
-            Button(onClick = { }) { Text("Botón Expandido") }
+            Button(onClick = { viewModel.navigateTo(Screen.Settings) }) {
+                Text("Ir a Configuración")
+            }
         }
     }
 }

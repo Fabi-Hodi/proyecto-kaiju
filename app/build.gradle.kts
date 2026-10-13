@@ -55,4 +55,10 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
+    //dependencias para cambiar de pestañas
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+
+    //para los Icons del profileScreen
+    implementation("androidx.compose.material:material-icons-extended")
 }

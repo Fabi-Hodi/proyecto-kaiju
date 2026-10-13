@@ -1,0 +1,38 @@
+package com.example.appkaiju_grupo10.viewmodels
+
+import androidx.lifecycle.ViewModel
+import com.example.appkaiju_grupo10.navigation.NavigationEvent
+import com.example.appkaiju_grupo10.navigation.Screen
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+class MainViewModel : ViewModel() {
+
+    private val _navigationEvents = MutableSharedFlow<NavigationEvent>()
+    val navigationEvents: SharedFlow<NavigationEvent> = _navigationEvents.asSharedFlow()
+
+    // función para ir a una pantalla especifica
+    fun navigateTo(screen: Screen) {
+        CoroutineScope(Dispatchers.Main).launch {
+            _navigationEvents.emit(NavigationEvent.NavigateTo(route = screen))
+        }
+    }
+
+    // función para volver a la pantalla anterior
+    fun navigateBack() {
+        CoroutineScope(Dispatchers.Main).launch {
+            _navigationEvents.emit(NavigationEvent.PopBackStack)
+        }
+    }
+
+    // función para subir en la jerarquia
+    fun navigateUp() {
+        CoroutineScope(Dispatchers.Main).launch {
+            _navigationEvents.emit(NavigationEvent.NavigateUp)
+        }
+    }
+}
