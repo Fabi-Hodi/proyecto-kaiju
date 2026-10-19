@@ -1,6 +1,5 @@
 package com.example.appkaiju_grupo10.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -9,35 +8,45 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+// Colores para modo claro
+private val LightColorScheme = lightColorScheme(
+    primary = KaijuAzul,
+    onPrimary = Color.White,
+    secondaryContainer = KaijuGrisBarra,
+    onSecondaryContainer = Color.Black,
+    background = KaijuGrisFondo,
+    onBackground = Color.Black,
+    surface = Color.White,
+    onSurface = Color.Black,
+    surfaceVariant = KaijuGrisTarjeta,
+    onSurfaceVariant = KaijuGrisTexto,
+    error = KaijuRojoStock,
+    onError = Color.White
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+// Colores para modo oscuro
+private val DarkColorScheme = darkColorScheme(
+    primary = KaijuAzulClaro,
+    onPrimary = KaijuAzulOscuro,
+    secondaryContainer = KaijuBarraOscura,
+    onSecondaryContainer = Color.White,
+    background = KaijuFondoOscuro,
+    onBackground = Color.White,
+    surface = KaijuSuperficieOscura,
+    onSurface = Color.White,
+    surfaceVariant = KaijuTarjetaOscura,
+    onSurfaceVariant = Color(0xFFBDBDBD),
+    error = KaijuRojoStockClaro,
+    onError = Color.Black
 )
 
 @Composable
 fun AppKaiju_Grupo10Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -45,7 +54,6 @@ fun AppKaiju_Grupo10Theme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

@@ -35,4 +35,26 @@ class MainViewModel : ViewModel() {
             _navigationEvents.emit(NavigationEvent.NavigateUp)
         }
     }
+    // funcion para ir al movimiento de stock de un producto especifico
+    fun navigateToMovimiento(sku: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            _navigationEvents.emit(
+                NavigationEvent.NavigateToRuta(Screen.Movimiento.crearRuta(sku))
+            )
+        }
+    }
+    // función para ir a una pantalla borrando el historial hasta "popUpTo"
+    // (ej: después del login, que "Atrás" no vuelva al Login)
+    fun navigateAndClear(screen: Screen, popUpTo: Screen) {
+        CoroutineScope(Dispatchers.Main).launch {
+            _navigationEvents.emit(
+                NavigationEvent.NavigateTo(
+                    route = screen,
+                    popUpToRoute = popUpTo,
+                    inclusive = true,
+                    singleTop = true
+                )
+            )
+        }
+    }
 }

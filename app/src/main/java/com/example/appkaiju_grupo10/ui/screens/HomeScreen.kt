@@ -45,10 +45,17 @@ fun HomeScreen(
                         viewModel.navigateTo(Screen.Profile)
                     }
                 )
+                NavigationDrawerItem(
+                    label = { Text(text = "Inventario") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        viewModel.navigateTo(Screen.Inventario)
+                    }
+                )
             }
         }
     ) {
-        // Aquí decidimos que diseño mostrar, pero ahora le pasamos las herramientas de navegación
         when (windowSizeClass.widthSizeClass) {
             WindowWidthSizeClass.Compact -> HomeScreenCompacta(viewModel, drawerState, scope)
             WindowWidthSizeClass.Medium -> HomeScreenMediana(viewModel, drawerState, scope)
