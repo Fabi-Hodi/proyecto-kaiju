@@ -54,6 +54,12 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                             is NavigationEvent.NavigateToRuta -> navController.navigate(event.ruta)
+                            is NavigationEvent.NavigateAndClearAll -> {
+                                navController.navigate(event.route.route) {
+                                    // graph.id = la raíz de la navegación: borra todas las pantallas
+                                    popUpTo(navController.graph.id) { inclusive = true }
+                                }
+                            }
                             is NavigationEvent.PopBackStack -> navController.popBackStack()
                             is NavigationEvent.NavigateUp -> navController.navigateUp()
                         }
@@ -76,8 +82,28 @@ class MainActivity : ComponentActivity() {
                         composable(route = Screen.Home.route) {
                             HomeScreen(navController = navController, viewModel = viewModel)
                         }
-                        composable(route = Screen.Inventario.route) {
-                            InventarioScreen(navController = navController, viewModel = viewModel)
+                        // ruta con argumentos OPCIONALES: nullable + valor por defecto null
+                        composable(
+                            route = Screen.Inventario.route,
+                            arguments = listOf(
+                                navArgument("categoria") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                    defaultValue = null
+                                },
+                                navArgument("busqueda") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                    defaultValue = null
+                                }
+                            )
+                        ) { backStackEntry ->
+                            InventarioScreen(
+                                navController = navController,
+                                viewModel = viewModel,
+                                categoria = backStackEntry.arguments?.getString("categoria"),
+                                busqueda = backStackEntry.arguments?.getString("busqueda")
+                            )
                         }
                         // ruta con argumento: le decimos que {sku} es un String
                         composable(

@@ -24,7 +24,7 @@ fun SettingsScreen(
         Text(text = "Pantalla de Configuración (Settings)")
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(onClick = { viewModel.navigateTo(Screen.Home) }) {
+        Button(onClick = { viewModel.volverAlInicio() }) {
             Text(text = "Volver al Inicio")
         }
 

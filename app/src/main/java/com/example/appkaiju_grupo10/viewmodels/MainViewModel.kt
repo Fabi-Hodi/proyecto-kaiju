@@ -57,4 +57,33 @@ class MainViewModel : ViewModel() {
             )
         }
     }
+    // función para ir al inventario, con filtros opcionales
+    fun navigateToInventario(categoria: String? = null, busqueda: String? = null) {
+        CoroutineScope(Dispatchers.Main).launch {
+            _navigationEvents.emit(
+                NavigationEvent.NavigateToRuta(Screen.Inventario.crearRuta(categoria, busqueda))
+            )
+        }
+    }
+
+    // cerrar sesión: ir al Login sin dejar ninguna pantalla atrás
+    fun cerrarSesion() {
+        CoroutineScope(Dispatchers.Main).launch {
+            _navigationEvents.emit(NavigationEvent.NavigateAndClearAll(Screen.Login))
+        }
+    }
+
+    // volver al Inicio que YA existe (sin crear uno nuevo encima)
+    fun volverAlInicio() {
+        CoroutineScope(Dispatchers.Main).launch {
+            _navigationEvents.emit(
+                NavigationEvent.NavigateTo(
+                    route = Screen.Home,
+                    popUpToRoute = Screen.Home,   // saca todo lo que está encima del Inicio
+                    inclusive = false,            // pero deja el Inicio
+                    singleTop = true              // y no crea otro
+                )
+            )
+        }
+    }
 }

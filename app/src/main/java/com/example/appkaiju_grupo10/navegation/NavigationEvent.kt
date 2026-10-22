@@ -10,6 +10,8 @@ sealed class NavigationEvent {
 
     // nuevo: sirve para navegar a rutas que llevan datos (ej: "movimiento_page/KAJ-2034")
     data class NavigateToRuta(val ruta: String) : NavigationEvent()
+    // navegar borrando TODO el historial (ej: cerrar sesión)
+    data class NavigateAndClearAll(val route: Screen) : NavigationEvent()
 
     data object PopBackStack : NavigationEvent()
     data object NavigateUp : NavigationEvent()

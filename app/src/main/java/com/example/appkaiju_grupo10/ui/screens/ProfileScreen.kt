@@ -29,7 +29,8 @@ fun ProfileScreen(
                         selected = selectedItem == index,
                         onClick = {
                             selectedItem = index
-                            viewModel.navigateTo(screen)
+                            if (screen == Screen.Home) viewModel.volverAlInicio()
+                            else viewModel.navigateTo(screen)
                         },
                         label = { Text(screen.route) },
                         icon = {

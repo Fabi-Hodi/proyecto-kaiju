@@ -19,30 +19,46 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.appkaiju_grupo10.R
 import com.example.appkaiju_grupo10.navigation.Screen
 import com.example.appkaiju_grupo10.ui.utils.validarEmail
 import com.example.appkaiju_grupo10.ui.utils.validarPassword
+import com.example.appkaiju_grupo10.viewmodels.LoginViewModel
 import com.example.appkaiju_grupo10.viewmodels.MainViewModel
+import com.example.appkaiju_grupo10.viewmodels.ResultadoLogin
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: MainViewModel) {
-
+fun LoginScreen(
+    navController: NavController,
+    viewModel: MainViewModel,
+    loginViewModel: LoginViewModel = viewModel()
+) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var verPassword by rememberSaveable { mutableStateOf(false) }
     var intentoEnviar by rememberSaveable { mutableStateOf(false) }
 
+    val isLoading by loginViewModel.isLoading.collectAsState()
+    val resultado by loginViewModel.resultado.collectAsState()
+
     val errorEmail = if (intentoEnviar) validarEmail(email) else null
     val errorPassword = if (intentoEnviar) validarPassword(password) else null
+
+    // Si las credenciales son correctas: ir al Home sin poder volver al Login
+    LaunchedEffect(resultado) {
+        if (resultado is ResultadoLogin.Exito) {
+            loginViewModel.limpiarResultado()
+            viewModel.navigateAndClear(Screen.Home, popUpTo = Screen.Login)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Card(
             modifier = Modifier.widthIn(max = 420.dp).fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
@@ -109,19 +125,37 @@ fun LoginScreen(navController: NavController, viewModel: MainViewModel) {
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                // error de credenciales (viene de la BD)
+                val errorLogin = resultado as? ResultadoLogin.Error
+                if (errorLogin != null) {
+                    Text(
+                        text = errorLogin.mensaje,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
                 // iniciar sesion
                 Button(
                     onClick = {
                         intentoEnviar = true
-                        val formularioValido =
+                        val formatoValido =
                             validarEmail(email) == null && validarPassword(password) == null
-                        if (formularioValido) {
-                            viewModel.navigateAndClear(Screen.Home, popUpTo = Screen.Login)
+                        if (formatoValido) {
+                            loginViewModel.iniciarSesion(email, password)   // ahora consulta Room
                         }
                     },
+                    enabled = !isLoading,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Iniciar sesión")
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Iniciar sesión")
+                    }
                 }
 
                 TextButton(onClick = { viewModel.navigateTo(Screen.Registro) }) {
