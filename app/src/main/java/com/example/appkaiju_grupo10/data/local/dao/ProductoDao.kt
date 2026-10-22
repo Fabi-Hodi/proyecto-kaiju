@@ -50,4 +50,8 @@ interface ProductoDao {
         ORDER BY categoria ASC
     """)
     fun obtenerCategorias(): Flow<List<CategoriaResumen>>
+
+    // Lectura puntual (sin Flow) para validar antes de guardar un movimiento
+    @Query("SELECT * FROM productos WHERE sku = :sku")
+    suspend fun buscarPorSku(sku: String): Producto?
 }

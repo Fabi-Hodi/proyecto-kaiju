@@ -13,7 +13,7 @@ import com.example.appkaiju_grupo10.model.Usuario
 
 @Database(
     entities = [Producto::class, Movimiento::class, Usuario::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

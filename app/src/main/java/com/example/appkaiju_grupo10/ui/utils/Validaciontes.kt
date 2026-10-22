@@ -1,6 +1,7 @@
 package com.example.appkaiju_grupo10.ui.utils
 
 import android.util.Patterns
+import com.example.appkaiju_grupo10.model.TipoMovimiento
 
 // Cada funcion devuelve
 fun validarEmail(email: String): String? = when {
@@ -66,4 +67,15 @@ fun validarConfirmacion(password: String, confirmacion: String): String? = when 
     confirmacion.isBlank() -> "Repite la contraseña"
     confirmacion != password -> "Las contraseñas no coinciden"
     else -> null
+}
+fun validarCantidad(texto: String, tipo: TipoMovimiento, stockActual: Int): String? {
+    val cantidad = texto.toIntOrNull()
+        ?: return if (texto.isBlank()) "Ingresa una cantidad" else "Solo números enteros"
+
+    return when {
+        tipo != TipoMovimiento.AJUSTE && cantidad <= 0 -> "Debe ser mayor a 0"
+        tipo == TipoMovimiento.SALIDA && cantidad > stockActual ->
+            "Stock insuficiente (hay $stockActual un.)"
+        else -> null
+    }
 }

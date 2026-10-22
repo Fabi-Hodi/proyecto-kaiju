@@ -39,6 +39,7 @@ import com.example.appkaiju_grupo10.ui.utils.obtenerWindowSizeClass
 import com.example.appkaiju_grupo10.viewmodels.InventarioViewModel
 import com.example.appkaiju_grupo10.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
+import com.example.appkaiju_grupo10.ui.components.iconoCategoria
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
