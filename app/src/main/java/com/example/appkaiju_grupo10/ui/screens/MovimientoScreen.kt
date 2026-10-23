@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.RemoveCircle
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -23,6 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -37,6 +39,7 @@ import com.example.appkaiju_grupo10.model.calcularStockResultante
 import com.example.appkaiju_grupo10.ui.components.MensajeAnimado
 import com.example.appkaiju_grupo10.ui.components.StockAnimado
 import com.example.appkaiju_grupo10.ui.components.iconoCategoria
+import com.example.appkaiju_grupo10.ui.utils.compartirProducto
 import com.example.appkaiju_grupo10.ui.utils.obtenerWindowSizeClass
 import com.example.appkaiju_grupo10.ui.utils.validarCantidad
 import com.example.appkaiju_grupo10.viewmodels.MainViewModel
@@ -60,6 +63,7 @@ fun MovimientoScreen(
     val historial by movimientoViewModel.historial.collectAsState()
     val isLoading by movimientoViewModel.isLoading.collectAsState()
     val resultado by movimientoViewModel.resultado.collectAsState()
+    val context = LocalContext.current
 
     val windowSizeClass = obtenerWindowSizeClass()
     var tipo by rememberSaveable { mutableStateOf(TipoMovimiento.ENTRADA) }
@@ -95,6 +99,15 @@ fun MovimientoScreen(
                 navigationIcon = {
                     IconButton(onClick = { viewModel.navigateBack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    }
+                },
+                actions = {
+                    // boton compartir: solo aparece cuando el producto ya cargo
+                    val prod = producto
+                    if (prod != null) {
+                        IconButton(onClick = { compartirProducto(context, prod) }) {
+                            Icon(Icons.Default.Share, contentDescription = "Compartir producto")
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
