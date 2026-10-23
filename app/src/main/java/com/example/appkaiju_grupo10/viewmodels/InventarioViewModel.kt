@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.appkaiju_grupo10.data.DatosFicticios
 import com.example.appkaiju_grupo10.data.local.AppDatabase
 import com.example.appkaiju_grupo10.model.Producto
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -30,6 +33,10 @@ class InventarioViewModel(application: Application) : AndroidViewModel(applicati
         initialValue = emptyList()
     )
 
+    // true mientras se cargan los datos iniciales (la pantalla muestra el loader)
+    private val _cargando = MutableStateFlow(true)
+    val cargando: StateFlow<Boolean> = _cargando.asStateFlow()
+
     init {
         cargarDatosIniciales()
     }
@@ -40,6 +47,9 @@ class InventarioViewModel(application: Application) : AndroidViewModel(applicati
             if (productoDao.contar() == 0) {
                 productoDao.insertarTodos(DatosFicticios.productos)
             }
+            // Simula una pequeña demora para que se aprecie el loader (como en la guía 12)
+            delay(800)
+            _cargando.value = false
         }
     }
 

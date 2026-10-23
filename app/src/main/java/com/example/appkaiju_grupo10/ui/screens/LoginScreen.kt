@@ -23,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.appkaiju_grupo10.R
 import com.example.appkaiju_grupo10.navigation.Screen
+import com.example.appkaiju_grupo10.ui.components.MensajeAnimado
 import com.example.appkaiju_grupo10.ui.utils.validarEmail
 import com.example.appkaiju_grupo10.ui.utils.validarPassword
 import com.example.appkaiju_grupo10.viewmodels.LoginViewModel
@@ -46,7 +47,7 @@ fun LoginScreen(
     val errorEmail = if (intentoEnviar) validarEmail(email) else null
     val errorPassword = if (intentoEnviar) validarPassword(password) else null
 
-    // Si las credenciales son correctas: ir al Home sin poder volver al Login
+    // si las credenciales son correctas: ir al Home sin poder volver al Login
     LaunchedEffect(resultado) {
         if (resultado is ResultadoLogin.Exito) {
             loginViewModel.limpiarResultado()
@@ -127,13 +128,7 @@ fun LoginScreen(
 
                 // error de credenciales (viene de la BD)
                 val errorLogin = resultado as? ResultadoLogin.Error
-                if (errorLogin != null) {
-                    Text(
-                        text = errorLogin.mensaje,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+                MensajeAnimado(mensaje = errorLogin?.mensaje, esError = true)
 
                 // iniciar sesion
                 Button(

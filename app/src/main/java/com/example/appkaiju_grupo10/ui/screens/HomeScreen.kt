@@ -249,7 +249,7 @@ fun TarjetaCategoria(categoria: CategoriaResumen, onClick: () -> Unit) {
     }
 }
 
-// Un ícono distinto según la categoría
+// un icono distinto según la categoría
 private fun iconoCategoria(nombre: String): ImageVector = when (nombre) {
     "Insumos" -> Icons.Default.Inventory2
     "Herramientas" -> Icons.Default.Build

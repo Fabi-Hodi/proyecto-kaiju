@@ -71,13 +71,7 @@ fun TarjetaProducto(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
-                    Text(
-                        text = "Stock: ${producto.stock} un.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = if (producto.stockBajo) MaterialTheme.colorScheme.error
-                        else MaterialTheme.colorScheme.onSurface
-                    )
+                    StockAnimado(stock = producto.stock, stockBajo = producto.stockBajo)
                     Text(
                         text = "Mín: ${producto.stockMinimo}",
                         style = MaterialTheme.typography.bodySmall,

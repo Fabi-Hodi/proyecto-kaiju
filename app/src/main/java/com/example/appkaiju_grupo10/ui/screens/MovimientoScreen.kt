@@ -34,13 +34,15 @@ import com.example.appkaiju_grupo10.model.Movimiento
 import com.example.appkaiju_grupo10.model.Producto
 import com.example.appkaiju_grupo10.model.TipoMovimiento
 import com.example.appkaiju_grupo10.model.calcularStockResultante
+import com.example.appkaiju_grupo10.ui.components.MensajeAnimado
+import com.example.appkaiju_grupo10.ui.components.StockAnimado
 import com.example.appkaiju_grupo10.ui.components.iconoCategoria
 import com.example.appkaiju_grupo10.ui.utils.obtenerWindowSizeClass
 import com.example.appkaiju_grupo10.ui.utils.validarCantidad
 import com.example.appkaiju_grupo10.viewmodels.MainViewModel
 import com.example.appkaiju_grupo10.viewmodels.MovimientoViewModel
 import com.example.appkaiju_grupo10.viewmodels.ResultadoMovimiento
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -60,12 +62,12 @@ fun MovimientoScreen(
     val resultado by movimientoViewModel.resultado.collectAsState()
 
     val windowSizeClass = obtenerWindowSizeClass()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
     var tipo by rememberSaveable { mutableStateOf(TipoMovimiento.ENTRADA) }
     var cantidadTexto by rememberSaveable { mutableStateOf("") }
     var notas by rememberSaveable { mutableStateOf("") }
     var intentoEnviar by rememberSaveable { mutableStateOf(false) }
+    // mensaje de éxito que se muestra animado unos segundos
+    var mensajeExito by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(resultado) {
         val r = resultado
@@ -73,8 +75,16 @@ fun MovimientoScreen(
             cantidadTexto = ""
             notas = ""
             intentoEnviar = false
-            scope.launch { snackbarHostState.showSnackbar(r.mensaje) }
+            mensajeExito = r.mensaje
             movimientoViewModel.limpiarResultado()
+        }
+    }
+
+    // se oculta solo a los 3 segundos (efecto separado para que limpiarResultado no lo cancele)
+    LaunchedEffect(mensajeExito) {
+        if (mensajeExito != null) {
+            delay(3000)
+            mensajeExito = null
         }
     }
 
@@ -91,8 +101,7 @@ fun MovimientoScreen(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer
                 )
             )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        }
     ) { innerPadding ->
         val p = producto
 
@@ -188,9 +197,8 @@ fun MovimientoScreen(
                     )
 
                     val errorVM = resultado as? ResultadoMovimiento.Error
-                    if (errorVM != null) {
-                        Text(errorVM.mensaje, color = MaterialTheme.colorScheme.error)
-                    }
+                    MensajeAnimado(mensaje = errorVM?.mensaje, esError = true)
+                    MensajeAnimado(mensaje = mensajeExito, esError = false)
 
                     Button(
                         onClick = {
@@ -275,12 +283,11 @@ private fun CabeceraProducto(producto: Producto) {
             )
             Text("SKU: ${producto.sku}")
             Text("Ubicación: ${producto.ubicacion}")
-            Text(
-                text = "Stock actual: ${producto.stock} un.",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = if (producto.stockBajo) MaterialTheme.colorScheme.error
-                else MaterialTheme.colorScheme.onSurface
+            StockAnimado(
+                stock = producto.stock,
+                stockBajo = producto.stockBajo,
+                prefijo = "Stock actual: ",
+                style = MaterialTheme.typography.titleMedium
             )
             Text(
                 text = "Stock mínimo: ${producto.stockMinimo} un.",

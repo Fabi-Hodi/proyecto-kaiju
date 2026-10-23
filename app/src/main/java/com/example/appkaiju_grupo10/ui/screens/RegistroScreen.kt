@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.appkaiju_grupo10.model.Rol
+import com.example.appkaiju_grupo10.ui.components.MensajeAnimado
 import com.example.appkaiju_grupo10.ui.utils.validarConfirmacion
 import com.example.appkaiju_grupo10.ui.utils.validarEmail
 import com.example.appkaiju_grupo10.ui.utils.validarNombre
@@ -222,13 +223,7 @@ fun RegistroScreen(
 
                 // ----- Error que viene de la base de datos -----
                 val errorBD = resultado as? ResultadoRegistro.Error
-                if (errorBD != null) {
-                    Text(
-                        text = errorBD.mensaje,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+                MensajeAnimado(mensaje = errorBD?.mensaje, esError = true)
 
                 // ----- Botón Guardar -----
                 Button(
