@@ -53,10 +53,4 @@ class InventarioViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    // PRUEBA TEMPORAL de persistencia
-    fun sumarStockPrueba(producto: Producto) {
-        viewModelScope.launch {
-            productoDao.actualizarStock(producto.sku, producto.stock + 1)
-        }
-    }
 }

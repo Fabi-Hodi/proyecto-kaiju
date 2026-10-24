@@ -13,7 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Share
+import com.example.appkaiju_grupo10.ui.utils.compartirReporteReposicion
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material.icons.filled.Warning
@@ -120,12 +121,12 @@ fun InventarioScreen(
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
                 )
+                // compartir la lista de productos a reponer (Whatsap, correo, etc.)
                 FilledTonalIconButton(
-                    onClick = {
-                        Toast.makeText(context, "Escáner QR: se activa en el Paso 11", Toast.LENGTH_SHORT).show()
-                    }
+                    onClick = { compartirReporteReposicion(context, productos) },
+                    enabled = cantidadStockBajo > 0
                 ) {
-                    Icon(Icons.Default.QrCodeScanner, contentDescription = "Escanear código QR")
+                    Icon(Icons.Default.Share, contentDescription = "Compartir reporte de reposición")
                 }
             }
 

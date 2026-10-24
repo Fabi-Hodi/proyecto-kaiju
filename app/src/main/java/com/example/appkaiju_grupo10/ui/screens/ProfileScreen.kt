@@ -41,6 +41,7 @@ fun ProfileScreen(
     val context = LocalContext.current
     val fotoUri by perfilViewModel.fotoUri.collectAsState()
     val errorImagen by perfilViewModel.errorImagen.collectAsState()
+    val usuario by viewModel.usuarioActual.collectAsState()
     var permisoDenegado by remember { mutableStateOf(false) }
 
     // galeria: GetContent devuelve el Uri elegido (o null si se cancela)
@@ -84,11 +85,11 @@ fun ProfileScreen(
                             if (screen == Screen.Home) viewModel.volverAlInicio()
                             else viewModel.navigateTo(screen)
                         },
-                        label = { Text(screen.route) },
+                        label = { Text(if (screen == Screen.Home) "Inicio" else "Perfil") },
                         icon = {
                             Icon(
                                 imageVector = if (screen == Screen.Home) Icons.Default.Home else Icons.Default.Person,
-                                contentDescription = screen.route
+                                contentDescription = if (screen == Screen.Home) "Inicio" else "Perfil"
                             )
                         }
                     )
@@ -105,6 +106,13 @@ fun ProfileScreen(
             verticalArrangement = Arrangement.Center
         ) {
             ImagenInteligente(uri = fotoUri)
+            // datos del operador que inició sesión
+            usuario?.let { u ->
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(u.nombreCompleto, style = MaterialTheme.typography.headlineSmall)
+                Text(u.email, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("RUT: ${u.rut} · Rol: ${u.rol.etiqueta}")
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
             Text("Foto de perfil", style = MaterialTheme.typography.titleLarge)

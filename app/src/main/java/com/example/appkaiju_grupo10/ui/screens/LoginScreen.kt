@@ -49,7 +49,9 @@ fun LoginScreen(
 
     // si las credenciales son correctas: ir al Home sin poder volver al Login
     LaunchedEffect(resultado) {
-        if (resultado is ResultadoLogin.Exito) {
+        val r = resultado
+        if (r is ResultadoLogin.Exito) {
+            viewModel.iniciarSesion(r.usuario)          // guardamos quien entro a la app
             loginViewModel.limpiarResultado()
             viewModel.navigateAndClear(Screen.Home, popUpTo = Screen.Login)
         }

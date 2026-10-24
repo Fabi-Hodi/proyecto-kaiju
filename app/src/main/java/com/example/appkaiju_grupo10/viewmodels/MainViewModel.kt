@@ -9,10 +9,20 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
+import com.example.appkaiju_grupo10.model.Usuario
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 class MainViewModel : ViewModel() {
 
     private val _navigationEvents = MutableSharedFlow<NavigationEvent>()
+    // usuario que inició sesión (lo comparten todas las pantallas)
+    private val _usuarioActual = MutableStateFlow<Usuario?>(null)
+    val usuarioActual: StateFlow<Usuario?> = _usuarioActual.asStateFlow()
+
+    fun iniciarSesion(usuario: Usuario) {
+        _usuarioActual.value = usuario
+    }
     val navigationEvents: SharedFlow<NavigationEvent> = _navigationEvents.asSharedFlow()
 
     // función para ir a una pantalla especifica
@@ -65,9 +75,9 @@ class MainViewModel : ViewModel() {
             )
         }
     }
-
-    // cerrar sesión: ir al Login sin dejar ninguna pantalla atrás
+    // cerrar sesión: olvidar al usuario e ir al Login sin dejar pantallas atrás
     fun cerrarSesion() {
+        _usuarioActual.value = null
         CoroutineScope(Dispatchers.Main).launch {
             _navigationEvents.emit(NavigationEvent.NavigateAndClearAll(Screen.Login))
         }

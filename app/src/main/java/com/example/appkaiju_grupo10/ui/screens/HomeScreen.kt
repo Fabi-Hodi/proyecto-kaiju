@@ -101,15 +101,6 @@ fun HomeScreen(
                         viewModel.navigateTo(Screen.Profile)
                     }
                 )
-                NavigationDrawerItem(
-                    label = { Text("Configuración") },
-                    icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-                    selected = false,
-                    onClick = {
-                        scope.launch { drawerState.close() }
-                        viewModel.navigateTo(Screen.Settings)
-                    }
-                )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                 NavigationDrawerItem(
                     label = { Text("Cerrar sesión") },
