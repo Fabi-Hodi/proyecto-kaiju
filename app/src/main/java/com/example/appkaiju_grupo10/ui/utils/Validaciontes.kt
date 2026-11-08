@@ -2,6 +2,7 @@ package com.example.appkaiju_grupo10.ui.utils
 
 import android.util.Patterns
 import com.example.appkaiju_grupo10.model.TipoMovimiento
+import java.text.Normalizer
 
 // Cada funcion devuelve
 fun validarEmail(email: String): String? = when {
@@ -78,4 +79,44 @@ fun validarCantidad(texto: String, tipo: TipoMovimiento, stockActual: Int): Stri
             "Stock insuficiente (hay $stockActual un.)"
         else -> null
     }
+}
+//  CATEGORIAS
+
+fun validarNombreCategoria(nombre: String): String? = when {
+    nombre.isBlank() -> "El nombre de la categoría es obligatorio"
+    nombre.trim().length < 3 -> "Debe tener al menos 3 letras"
+    nombre.trim().length > 30 -> "Máximo 30 caracteres"
+    else -> null
+}
+
+fun validarPrefijo(prefijo: String): String? = when {
+    prefijo.isBlank() -> "El prefijo es obligatorio"
+    !prefijo.matches(Regex("^[A-Z]{2,3}$")) -> "Usa 2 o 3 letras mayúsculas (ej: IN)"
+    else -> null
+}
+
+// Sugiere el prefijo con las 2 primeras letras: "Optica" -> "OP", "Insumos" -> "IN"
+fun sugerirPrefijo(nombre: String): String {
+    val sinTildes = Normalizer.normalize(nombre, Normalizer.Form.NFD)
+        .replace(Regex("\\p{Mn}+"), "")          // quita tildes: Ó -> O
+    return sinTildes.uppercase().filter { it in 'A'..'Z' }.take(2)
+}
+
+// ----- PRODUCTOS -----
+
+fun validarObligatorio(texto: String, campo: String): String? =
+    if (texto.isBlank()) "$campo es obligatorio" else null
+
+// Para stock y stock mínimo: número entero, puede ser 0
+fun validarEnteroNoNegativo(texto: String, campo: String): String? {
+    val numero = texto.toIntOrNull()
+        ?: return if (texto.isBlank()) "$campo es obligatorio" else "Solo números enteros"
+    return if (numero < 0) "$campo no puede ser negativo" else null
+}
+
+// Para el precio: número entero mayor a 0
+fun validarPrecio(texto: String): String? {
+    val numero = texto.toIntOrNull()
+        ?: return if (texto.isBlank()) "El precio es obligatorio" else "Solo números enteros"
+    return if (numero <= 0) "El precio debe ser mayor a 0" else null
 }

@@ -10,10 +10,12 @@ import com.example.appkaiju_grupo10.data.local.dao.UsuarioDao
 import com.example.appkaiju_grupo10.model.Movimiento
 import com.example.appkaiju_grupo10.model.Producto
 import com.example.appkaiju_grupo10.model.Usuario
+import com.example.appkaiju_grupo10.data.local.dao.CategoriaDao
+import com.example.appkaiju_grupo10.model.Categoria
 
 @Database(
-    entities = [Producto::class, Movimiento::class, Usuario::class],
-    version = 3,
+    entities = [Producto::class, Movimiento::class, Usuario::class, Categoria::class],
+    version = 4,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -21,6 +23,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val productoDao: ProductoDao
     abstract val movimientoDao: MovimientoDao
     abstract val usuarioDao: UsuarioDao
+
+    abstract val categoriaDao: CategoriaDao
 
     companion object {
         // @Volatile: todos los hilos ven siempre el mismo valor actualizado

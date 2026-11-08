@@ -43,15 +43,22 @@ interface ProductoDao {
     @Update
     suspend fun actualizar(producto: Producto)
     // Categorías con cuántos productos tiene cada una (pantalla Inicio)
+    // Categorías con cuántos productos tiene cada una (pantalla Inicio)
+    // LEFT JOIN: muestra también las categorías nuevas que aún no tienen productos (cantidad 0)
     @Query("""
-        SELECT categoria, COUNT(*) AS cantidad
-        FROM productos
-        GROUP BY categoria
-        ORDER BY categoria ASC
+        SELECT c.nombre AS categoria, COUNT(p.sku) AS cantidad
+        FROM categorias c
+        LEFT JOIN productos p ON p.categoria = c.nombre
+        GROUP BY c.nombre
+        ORDER BY c.nombre ASC
     """)
     fun obtenerCategorias(): Flow<List<CategoriaResumen>>
 
     // Lectura puntual (sin Flow) para validar antes de guardar un movimiento
     @Query("SELECT * FROM productos WHERE sku = :sku")
     suspend fun buscarPorSku(sku: String): Producto?
+
+    // Insertar UN producto nuevo; si el SKU ya existiera, falla (ABORT, el valor por defecto)
+    @Insert
+    suspend fun insertar(producto: Producto)
 }

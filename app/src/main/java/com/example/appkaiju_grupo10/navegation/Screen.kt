@@ -26,4 +26,8 @@ sealed class Screen(val route: String) {
 
     data object Profile : Screen("profile_page")
     data object Settings : Screen("settings_page")
+
+    data object AgregarProducto : Screen("agregar_producto_page")
+
+    data object AgregarCategoria : Screen("agregar_categoria_page")
 }

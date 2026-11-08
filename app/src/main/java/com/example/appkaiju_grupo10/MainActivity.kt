@@ -31,6 +31,8 @@ import com.example.appkaiju_grupo10.ui.screens.SettingsScreen
 import com.example.appkaiju_grupo10.ui.theme.AppKaiju_Grupo10Theme
 import com.example.appkaiju_grupo10.viewmodels.MainViewModel
 import kotlinx.coroutines.flow.collectLatest
+import com.example.appkaiju_grupo10.ui.screens.AgregarCategoriaScreen
+import com.example.appkaiju_grupo10.ui.screens.AgregarProductoScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -149,6 +151,12 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(route = Screen.Settings.route) {
                             SettingsScreen(navController = navController, viewModel = viewModel)
+                        }
+                        composable(route = Screen.AgregarProducto.route) {
+                            AgregarProductoScreen(navController = navController, viewModel = viewModel)
+                        }
+                        composable(route = Screen.AgregarCategoria.route) {
+                            AgregarCategoriaScreen(navController = navController, viewModel = viewModel)
                         }
                     }
                 }

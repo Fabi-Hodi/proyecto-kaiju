@@ -19,6 +19,7 @@ class InventarioViewModel(application: Application) : AndroidViewModel(applicati
 
     // Pedimos la base de datos unica y su DAO de productos
     private val productoDao = AppDatabase.getDatabase(application).productoDao
+    private val categoriaDao = AppDatabase.getDatabase(application).categoriaDao
 
     // Lista reactiva: cada vez que cambia la tabla, la pantalla se actualiza sola
     val productos: StateFlow<List<Producto>> = productoDao.obtenerTodos().stateIn(
@@ -41,15 +42,17 @@ class InventarioViewModel(application: Application) : AndroidViewModel(applicati
         cargarDatosIniciales()
     }
 
-    // Si la tabla esta vacia (primera vez que se abre la app), copiamos el catalogo ficticio por ahora
+
+    // Si la tabla esta vacia (primera vez que se abre la app), copiamos el catalogo ficticio
     private fun cargarDatosIniciales() {
         viewModelScope.launch {
             if (productoDao.contar() == 0) {
+                categoriaDao.insertarTodas(DatosFicticios.categorias)   // primero las categorías
                 productoDao.insertarTodos(DatosFicticios.productos)
             }
             // Simula una pequeña demora para que se aprecie el loader (como en la guía 12)
             delay(800)
-            _cargando.value = false
+            _cargando.value = false      // ← esta línea apaga la ruedita
         }
     }
 

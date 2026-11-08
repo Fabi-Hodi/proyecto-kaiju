@@ -1,6 +1,5 @@
 package com.example.appkaiju_grupo10.ui.screens
 
-import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
@@ -12,11 +11,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Share
-import com.example.appkaiju_grupo10.ui.utils.compartirReporteReposicion
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,7 +28,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.appkaiju_grupo10.navigation.Screen
 import com.example.appkaiju_grupo10.ui.components.TarjetaProducto
+import com.example.appkaiju_grupo10.ui.utils.compartirReporteReposicion
 import com.example.appkaiju_grupo10.viewmodels.InventarioViewModel
 import com.example.appkaiju_grupo10.viewmodels.MainViewModel
 
@@ -90,6 +91,14 @@ fun InventarioScreen(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer
                 )
             )
+        },
+        // NUEVO: botón flotante para agregar un producto
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { viewModel.navigateTo(Screen.AgregarProducto) },
+                icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                text = { Text("Producto") }
+            )
         }
     ) { innerPadding ->
         Column(
@@ -121,7 +130,7 @@ fun InventarioScreen(
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
                 )
-                // compartir la lista de productos a reponer (Whatsap, correo, etc.)
+                // compartir la lista de productos a reponer (WhatsApp, correo, etc.)
                 FilledTonalIconButton(
                     onClick = { compartirReporteReposicion(context, productos) },
                     enabled = cantidadStockBajo > 0
@@ -209,7 +218,7 @@ fun InventarioScreen(
                         }
                     }
 
-                    // VACiO: mensaje amigable + botón para limpiar filtros
+                    // VACÍO: mensaje amigable + botón para limpiar filtros
                     EstadoLista.VACIO -> {
                         Column(
                             modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -247,14 +256,15 @@ fun InventarioScreen(
                         }
                     }
 
-                    //CON DATOS: la grilla de productos
+                    // CON DATOS: la grilla de productos
                     EstadoLista.CON_DATOS -> {
                         LazyVerticalGrid(
                             // las columnas como quepan de al menos 320 dp
                             columns = GridCells.Adaptive(minSize = 320.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
-                            contentPadding = PaddingValues(bottom = 16.dp)
+                            // NUEVO: espacio abajo para que el botón flotante no tape la última tarjeta
+                            contentPadding = PaddingValues(bottom = 96.dp)
                         ) {
                             items(items = productosFiltrados, key = { it.sku }) { producto ->
                                 TarjetaProducto(

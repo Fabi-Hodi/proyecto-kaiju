@@ -40,6 +40,8 @@ import com.example.appkaiju_grupo10.viewmodels.InventarioViewModel
 import com.example.appkaiju_grupo10.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 import com.example.appkaiju_grupo10.ui.components.iconoCategoria
+import androidx.compose.material.icons.filled.AddBox
+import androidx.compose.material.icons.filled.Category
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,6 +92,24 @@ fun HomeScreen(
                     onClick = {
                         scope.launch { drawerState.close() }
                         viewModel.navigateToInventario()
+                    }
+                )
+                NavigationDrawerItem(
+                    label = { Text("Nuevo producto") },
+                    icon = { Icon(Icons.Default.AddBox, contentDescription = null) },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        viewModel.navigateTo(Screen.AgregarProducto)
+                    }
+                )
+                NavigationDrawerItem(
+                    label = { Text("Nueva categoría") },
+                    icon = { Icon(Icons.Default.Category, contentDescription = null) },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        viewModel.navigateTo(Screen.AgregarCategoria)
                     }
                 )
                 NavigationDrawerItem(
