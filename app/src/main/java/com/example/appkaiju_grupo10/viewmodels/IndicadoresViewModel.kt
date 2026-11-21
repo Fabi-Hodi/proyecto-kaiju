@@ -16,9 +16,10 @@ sealed class EstadoDolar {
     data object Error : EstadoDolar()
 }
 
-class IndicadoresViewModel : ViewModel() {
-
-    private val repository = IndicadoresRepository()
+// el repositorio se recibe en el constructor: la app usa el real y los tests uno falso (MockK)
+class IndicadoresViewModel(
+    private val repository: IndicadoresRepository = IndicadoresRepository()
+) : ViewModel() {
 
     private val _estado = MutableStateFlow<EstadoDolar>(EstadoDolar.Cargando)
     val estado: StateFlow<EstadoDolar> = _estado.asStateFlow()

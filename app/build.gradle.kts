@@ -71,4 +71,13 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    // Testing
+    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")        // Kotest: escribir y correr tests
+    testImplementation("io.kotest:kotest-assertions-core:5.9.1")      // shouldBe, shouldContain...
+    testImplementation("io.mockk:mockk:1.13.12")                      // simular dependencias (API, repositorio)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")  // testear corrutinas
+}
+// Kotest corre sobre JUnit 5 (JUnit Platform)
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
