@@ -20,7 +20,8 @@ import java.util.Locale
 fun TarjetaProducto(
     producto: Producto,
     onVerFicha: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    dolar: Double? = null          // valor del dólar en CLP (null = aún no disponible)
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -81,6 +82,14 @@ fun TarjetaProducto(
                         text = formatearPrecio(producto.precio),
                         style = MaterialTheme.typography.bodySmall
                     )
+                    // equivalente en dolares (solo si la API ya respondió)
+                    if (dolar != null && dolar > 0) {
+                        Text(
+                            text = "≈ US$ ${formatearUsd(producto.precio / dolar)}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     if (producto.stockBajo) {
                         Surface(
                             color = MaterialTheme.colorScheme.error,
@@ -102,6 +111,13 @@ fun TarjetaProducto(
             }
         }
     }
+}
+
+private fun formatearUsd(valor: Double): String {
+    val formato = NumberFormat.getNumberInstance(Locale.forLanguageTag("es-CL"))
+    formato.minimumFractionDigits = 2
+    formato.maximumFractionDigits = 2
+    return formato.format(valor)
 }
 
 private fun formatearPrecio(precio: Int): String {

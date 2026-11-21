@@ -29,8 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.appkaiju_grupo10.navigation.Screen
+import com.example.appkaiju_grupo10.ui.components.BannerDolar
 import com.example.appkaiju_grupo10.ui.components.TarjetaProducto
 import com.example.appkaiju_grupo10.ui.utils.compartirReporteReposicion
+import com.example.appkaiju_grupo10.viewmodels.EstadoDolar
+import com.example.appkaiju_grupo10.viewmodels.IndicadoresViewModel
 import com.example.appkaiju_grupo10.viewmodels.InventarioViewModel
 import com.example.appkaiju_grupo10.viewmodels.MainViewModel
 
@@ -44,11 +47,16 @@ fun InventarioScreen(
     viewModel: MainViewModel,
     categoria: String? = null,
     busqueda: String? = null,
-    inventarioViewModel: InventarioViewModel = viewModel()
+    inventarioViewModel: InventarioViewModel = viewModel(),
+    indicadoresViewModel: IndicadoresViewModel = viewModel()
 ) {
     val productos by inventarioViewModel.productos.collectAsState()
     val categorias by inventarioViewModel.categorias.collectAsState()
     val cargando by inventarioViewModel.cargando.collectAsState()
+
+    // API publica dólar del día
+    val estadoDolar by indicadoresViewModel.estado.collectAsState()
+    val valorDolar = (estadoDolar as? EstadoDolar.Listo)?.dolar?.valor
     val context = LocalContext.current
 
     var texto by rememberSaveable { mutableStateOf(busqueda ?: "") }
@@ -170,6 +178,13 @@ fun InventarioScreen(
                 }
             }
 
+            // dolar del día + valor del inventario en dólares (consumo de la API pública)
+            BannerDolar(
+                estado = estadoDolar,
+                valorInventarioClp = productos.sumOf { it.precio.toLong() * it.stock },
+                onReintentar = { indicadoresViewModel.cargarDolar() }
+            )
+
             if (cantidadStockBajo > 0 && !soloStockBajo) {
                 Card(
                     onClick = { soloStockBajo = true },
@@ -269,7 +284,8 @@ fun InventarioScreen(
                             items(items = productosFiltrados, key = { it.sku }) { producto ->
                                 TarjetaProducto(
                                     producto = producto,
-                                    onVerFicha = { viewModel.navigateToMovimiento(producto.sku) }
+                                    onVerFicha = { viewModel.navigateToMovimiento(producto.sku) },
+                                    dolar = valorDolar
                                 )
                             }
                         }
