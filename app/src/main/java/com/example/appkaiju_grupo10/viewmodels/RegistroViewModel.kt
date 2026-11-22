@@ -1,19 +1,14 @@
 package com.example.appkaiju_grupo10.viewmodels
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.appkaiju_grupo10.data.local.AppDatabase
 import com.example.appkaiju_grupo10.model.Rol
-import com.example.appkaiju_grupo10.model.Usuario
-import com.example.appkaiju_grupo10.ui.utils.normalizarRut
-import com.example.appkaiju_grupo10.utils.generarHash
-import kotlinx.coroutines.Dispatchers
+import com.example.appkaiju_grupo10.repository.AuthException
+import com.example.appkaiju_grupo10.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 // Los posibles resultados de intentar guardar
 sealed class ResultadoRegistro {
@@ -21,9 +16,11 @@ sealed class ResultadoRegistro {
     data class Error(val mensaje: String) : ResultadoRegistro()
 }
 
-class RegistroViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val usuarioDao = AppDatabase.getDatabase(application).usuarioDao
+// Registra al operador en el backend (tabla usuario_kaiju en PostgreSQL), ya no en Room.
+// El backend valida el RUT, evita RUT/email repetidos y guarda la contraseña con BCrypt.
+class RegistroViewModel(
+    private val repository: AuthRepository = AuthRepository()
+) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -38,31 +35,17 @@ class RegistroViewModel(application: Application) : AndroidViewModel(application
             _resultado.value = null
 
             try {
-                val rutFinal = normalizarRut(rut)
-                val emailFinal = email.trim().lowercase()
-
-                when {
-                    usuarioDao.buscarPorRut(rutFinal) != null ->
-                        _resultado.value = ResultadoRegistro.Error("Ya existe un operador con ese RUT")
-
-                    usuarioDao.buscarPorEmail(emailFinal) != null ->
-                        _resultado.value = ResultadoRegistro.Error("Ese email ya está registrado")
-
-                    else -> {
-                        // el hash es un cálculo pesado: lo hacemos fuera del hilo de la pantalla
-                        val hash = withContext(Dispatchers.Default) { generarHash(password) }
-                        usuarioDao.insertar(
-                            Usuario(
-                                rut = rutFinal,
-                                nombreCompleto = nombre.trim(),
-                                email = emailFinal,
-                                rol = rol,
-                                passwordHash = hash
-                            )
-                        )
-                        _resultado.value = ResultadoRegistro.Exito
-                    }
-                }
+                repository.registrar(
+                    nombreCompleto = nombre,
+                    rut = rut,
+                    email = email,
+                    password = password,
+                    rol = rol.name                      // "BODEGA", "VENTAS" o "ADMIN"
+                )
+                _resultado.value = ResultadoRegistro.Exito
+            } catch (e: AuthException) {
+                // ej: "Ya existe un operador con ese RUT" (mensaje que manda el backend)
+                _resultado.value = ResultadoRegistro.Error(e.message ?: "No se pudo guardar el operador")
             } catch (e: Exception) {
                 _resultado.value = ResultadoRegistro.Error("No se pudo guardar el operador")
             } finally {

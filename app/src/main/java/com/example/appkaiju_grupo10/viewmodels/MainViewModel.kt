@@ -1,21 +1,25 @@
 package com.example.appkaiju_grupo10.viewmodels
 
 import androidx.lifecycle.ViewModel
+import com.example.appkaiju_grupo10.model.Usuario
 import com.example.appkaiju_grupo10.navigation.NavigationEvent
 import com.example.appkaiju_grupo10.navigation.Screen
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import com.example.appkaiju_grupo10.repository.SesionKaiju
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import com.example.appkaiju_grupo10.model.Usuario
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
 class MainViewModel : ViewModel() {
 
     private val _navigationEvents = MutableSharedFlow<NavigationEvent>()
+    val navigationEvents: SharedFlow<NavigationEvent> = _navigationEvents.asSharedFlow()
+
     // usuario que inició sesión (lo comparten todas las pantallas)
     private val _usuarioActual = MutableStateFlow<Usuario?>(null)
     val usuarioActual: StateFlow<Usuario?> = _usuarioActual.asStateFlow()
@@ -23,7 +27,6 @@ class MainViewModel : ViewModel() {
     fun iniciarSesion(usuario: Usuario) {
         _usuarioActual.value = usuario
     }
-    val navigationEvents: SharedFlow<NavigationEvent> = _navigationEvents.asSharedFlow()
 
     // función para ir a una pantalla especifica
     fun navigateTo(screen: Screen) {
@@ -45,6 +48,7 @@ class MainViewModel : ViewModel() {
             _navigationEvents.emit(NavigationEvent.NavigateUp)
         }
     }
+
     // funcion para ir al movimiento de stock de un producto especifico
     fun navigateToMovimiento(sku: String) {
         CoroutineScope(Dispatchers.Main).launch {
@@ -53,6 +57,7 @@ class MainViewModel : ViewModel() {
             )
         }
     }
+
     // función para ir a una pantalla borrando el historial hasta "popUpTo"
     // (ej: después del login, que "Atrás" no vuelva al Login)
     fun navigateAndClear(screen: Screen, popUpTo: Screen) {
@@ -67,6 +72,7 @@ class MainViewModel : ViewModel() {
             )
         }
     }
+
     // función para ir al inventario, con filtros opcionales
     fun navigateToInventario(categoria: String? = null, busqueda: String? = null) {
         CoroutineScope(Dispatchers.Main).launch {
@@ -75,9 +81,11 @@ class MainViewModel : ViewModel() {
             )
         }
     }
-    // cerrar sesión: olvidar al usuario e ir al Login sin dejar pantallas atrás
+
+    // cerrar sesión: olvidar al usuario y el token, e ir al Login sin dejar pantallas atrás
     fun cerrarSesion() {
         _usuarioActual.value = null
+        SesionKaiju.cerrar()                      // NUEVO: se borra el token JWT
         CoroutineScope(Dispatchers.Main).launch {
             _navigationEvents.emit(NavigationEvent.NavigateAndClearAll(Screen.Login))
         }

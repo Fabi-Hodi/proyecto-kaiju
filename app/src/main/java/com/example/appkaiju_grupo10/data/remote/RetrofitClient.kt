@@ -7,17 +7,23 @@ import retrofit2.converter.gson.GsonConverterFactory
 // cada API tiene su propia URL base, por eso cada una tiene su propia instancia de Retrofit.
 object RetrofitClient {
 
+    // IP pública del EC2 (cambia cada vez que se reinicia el laboratorio de AWS Academy).
+    // Si cambia, actualizarla aquí y en res/xml/network_security_config.xml
+    private const val URL_BACKEND = "http://54.89.147.68:8080/"
+
     private fun crear(baseUrl: String): Retrofit =
         Retrofit.Builder()
             .baseUrl(baseUrl)                                    // debe terminar en "/"
             .addConverterFactory(GsonConverterFactory.create())  // JSON -> data class
             .build()
 
-    //API pública: indicadores económicos de Chile (dólar, UF, etc.)
+    // API pública: indicadores económicos de Chile (dólar, UF, etc.)
     val indicadoresApi: IndicadoresApi by lazy {
         crear("https://mindicador.cl/").create(IndicadoresApi::class.java)
     }
 
-    // aqui se agregara la API propia del grupo (backend con base de datos):
-    // val kaijuApi: KaijuApi by lazy { crear("http://10.0.2.2:8080/").create(KaijuApi::class.java) }
+    // API propia: login y registro de Kaiju (backend Spring Boot de Sonido Vivo, rama alonso/kaiju-auth)
+    val kaijuAuthApi: KaijuAuthApi by lazy {
+        crear(URL_BACKEND).create(KaijuAuthApi::class.java)
+    }
 }

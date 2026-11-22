@@ -1,26 +1,28 @@
 package com.example.appkaiju_grupo10.viewmodels
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.appkaiju_grupo10.data.local.AppDatabase
+import com.example.appkaiju_grupo10.data.remote.UsuarioKaijuResponse
+import com.example.appkaiju_grupo10.model.Rol
 import com.example.appkaiju_grupo10.model.Usuario
-import com.example.appkaiju_grupo10.utils.verificarPassword
-import kotlinx.coroutines.Dispatchers
+import com.example.appkaiju_grupo10.repository.AuthException
+import com.example.appkaiju_grupo10.repository.AuthRepository
+import com.example.appkaiju_grupo10.repository.SesionKaiju
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 sealed class ResultadoLogin {
     data class Exito(val usuario: Usuario) : ResultadoLogin()
     data class Error(val mensaje: String) : ResultadoLogin()
 }
 
-class LoginViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val usuarioDao = AppDatabase.getDatabase(application).usuarioDao
+// Inicia sesión contra el backend (tabla usuario_kaiju en PostgreSQL), ya no contra Room.
+// El repositorio se recibe en el constructor: la app usa el real y los tests uno falso (MockK).
+class LoginViewModel(
+    private val repository: AuthRepository = AuthRepository()
+) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -35,20 +37,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             _resultado.value = null
 
             try {
-                // 1. ¿Existe un operador con ese email?
-                val usuario = usuarioDao.buscarPorEmail(email.trim().lowercase())
-
-                // 2. ¿La contraseña coincide con la huella guardada?
-                val passwordCorrecta = usuario != null && withContext(Dispatchers.Default) {
-                    verificarPassword(password, usuario.passwordHash)
-                }
-
-                _resultado.value = if (usuario != null && passwordCorrecta) {
-                    ResultadoLogin.Exito(usuario)
-                } else {
-                    // mismo mensaje en los dos casos (ver explicación)
-                    ResultadoLogin.Error("Email o contraseña incorrectos")
-                }
+                val respuesta = repository.login(email, password)
+                SesionKaiju.iniciar(respuesta.accessToken)               // guardamos el token de la sesión
+                _resultado.value = ResultadoLogin.Exito(respuesta.usuario.aUsuario())
+            } catch (e: AuthException) {
+                // mensaje ya listo: "Email o contraseña incorrectos", "No se pudo conectar...", etc.
+                _resultado.value = ResultadoLogin.Error(e.message ?: "No se pudo iniciar sesión")
             } catch (e: Exception) {
                 _resultado.value = ResultadoLogin.Error("No se pudo iniciar sesión")
             } finally {
@@ -61,3 +55,13 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         _resultado.value = null
     }
 }
+
+// Convierte la respuesta de la API al modelo que ya usan las pantallas (Perfil, sesión).
+// passwordHash queda vacío: la contraseña nunca viaja de vuelta desde el servidor.
+fun UsuarioKaijuResponse.aUsuario(): Usuario = Usuario(
+    rut = rut,
+    nombreCompleto = nombreCompleto,
+    email = email,
+    rol = runCatching { Rol.valueOf(rol) }.getOrDefault(Rol.BODEGA),
+    passwordHash = ""
+)
