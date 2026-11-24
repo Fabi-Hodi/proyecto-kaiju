@@ -137,7 +137,9 @@ Variables necesarias en `.env` (no incluidas en el repositorio): `DB_URL`, `DB_U
 - Las contraseñas de la llave **no se publican** en el repositorio; se entregan al docente por un canal privado.
 
 **Captura del APK firmado:**
-![APK firmado] https://drive.google.com/file/d/1MLz0evqkTbzhGfwex9meG6MSuQAp5NNd/view?usp=sharing
+![APK firmado] https://drive.google.com/file/d/1MLz0evqkTbzhGfwex9meG6MSuQAp5NNd/view?usp=sharing,
+https://drive.google.com/file/d/1Oo5uNaSj6SunY3s14gSGk1dn-cWDrq8H/view?usp=sharing,
+https://drive.google.com/file/d/1tB1gCbo8_3Zvaa950f2InmFha3Kd3rb0/view?usp=sharing
 
 **Captura de la llave .jks:**
 ![Llave jks] https://drive.google.com/file/d/1NAU1wABuW3t51mM1kvh0FPg_cR7hSKl0/view?usp=sharing
