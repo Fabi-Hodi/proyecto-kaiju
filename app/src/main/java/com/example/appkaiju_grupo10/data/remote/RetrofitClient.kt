@@ -9,7 +9,7 @@ object RetrofitClient {
 
     // IP pública del EC2 (cambia cada vez que se reinicia el laboratorio de AWS Academy).
     // Si cambia, actualizarla aquí y en res/xml/network_security_config.xml
-    private const val URL_BACKEND = "http://54.89.147.68:8080/"
+    private const val URL_BACKEND = "http://54.205.69.58:8080/"
 
     private fun crear(baseUrl: String): Retrofit =
         Retrofit.Builder()

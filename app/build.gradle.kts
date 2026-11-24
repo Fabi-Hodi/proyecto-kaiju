@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.appkaiju_grupo10"
+    namespace = "com.example.appkaiju_grupo10"   // paquete del código: NO cambia
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -13,7 +13,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.appkaiju_grupo10"
+        // CAMBIO: identificador único de la app (el que se registra en Android Developer Console)
+        applicationId = "cl.duocuc.grupo10.kaiju.inventario"
         minSdk = 28
         targetSdk = 36
         versionCode = 1
