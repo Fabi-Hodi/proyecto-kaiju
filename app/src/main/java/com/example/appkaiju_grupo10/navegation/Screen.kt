@@ -30,4 +30,19 @@ sealed class Screen(val route: String) {
     data object AgregarProducto : Screen("agregar_producto_page")
 
     data object AgregarCategoria : Screen("agregar_categoria_page")
+
+    // ----- Administración (solo rol ADMIN) -----
+    data object AdminUsuarios : Screen("admin_usuarios_page")
+
+    // Recibe el id del usuario a editar
+    data object EditarUsuario : Screen("editar_usuario_page/{id}") {
+        fun crearRuta(id: Long) = "editar_usuario_page/$id"
+    }
+
+    data object AdminProductos : Screen("admin_productos_page")
+
+    // Recibe el SKU del producto a editar
+    data object EditarProducto : Screen("editar_producto_page/{sku}") {
+        fun crearRuta(sku: String) = "editar_producto_page/$sku"
+    }
 }

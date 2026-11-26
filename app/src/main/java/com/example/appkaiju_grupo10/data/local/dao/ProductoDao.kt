@@ -1,13 +1,14 @@
 package com.example.appkaiju_grupo10.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.appkaiju_grupo10.model.CategoriaResumen
 import com.example.appkaiju_grupo10.model.Producto
 import kotlinx.coroutines.flow.Flow
-import com.example.appkaiju_grupo10.model.CategoriaResumen
 
 @Dao
 interface ProductoDao {
@@ -16,7 +17,7 @@ interface ProductoDao {
     @Query("SELECT * FROM productos ORDER BY nombre ASC")
     fun obtenerTodos(): Flow<List<Producto>>
 
-    // Un producto por su SKU (para la pantalla movimiento)
+    // Un producto por su SKU (para la pantalla movimiento y editar producto)
     @Query("SELECT * FROM productos WHERE sku = :sku")
     fun obtenerPorSku(sku: String): Flow<Producto?>
 
@@ -42,7 +43,11 @@ interface ProductoDao {
 
     @Update
     suspend fun actualizar(producto: Producto)
-    // Categorías con cuántos productos tiene cada una (pantalla Inicio)
+
+    // NUEVO: eliminar un producto (administración). Su historial de movimientos se conserva.
+    @Delete
+    suspend fun eliminar(producto: Producto)
+
     // Categorías con cuántos productos tiene cada una (pantalla Inicio)
     // LEFT JOIN: muestra también las categorías nuevas que aún no tienen productos (cantidad 0)
     @Query("""
@@ -54,7 +59,7 @@ interface ProductoDao {
     """)
     fun obtenerCategorias(): Flow<List<CategoriaResumen>>
 
-    // Lectura puntual (sin Flow) para validar antes de guardar un movimiento
+    // Lectura puntual (sin Flow) para validar antes de guardar
     @Query("SELECT * FROM productos WHERE sku = :sku")
     suspend fun buscarPorSku(sku: String): Producto?
 

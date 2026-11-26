@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -23,7 +24,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.appkaiju_grupo10.model.Rol
 import com.example.appkaiju_grupo10.ui.components.MensajeAnimado
 import com.example.appkaiju_grupo10.ui.utils.validarConfirmacion
 import com.example.appkaiju_grupo10.ui.utils.validarEmail
@@ -34,7 +34,6 @@ import com.example.appkaiju_grupo10.viewmodels.MainViewModel
 import com.example.appkaiju_grupo10.viewmodels.RegistroViewModel
 import com.example.appkaiju_grupo10.viewmodels.ResultadoRegistro
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistroScreen(
     navController: NavController,
@@ -48,8 +47,6 @@ fun RegistroScreen(
     var password by rememberSaveable { mutableStateOf("") }
     var confirmacion by rememberSaveable { mutableStateOf("") }
     var verPassword by rememberSaveable { mutableStateOf(false) }
-    var rol by rememberSaveable { mutableStateOf<Rol?>(null) }
-    var menuRolAbierto by remember { mutableStateOf(false) }
     var intentoEnviar by rememberSaveable { mutableStateOf(false) }
 
     // ----- ESTADO que viene del ViewModel -----
@@ -63,7 +60,6 @@ fun RegistroScreen(
     val errorEmail = if (intentoEnviar) validarEmail(email) else null
     val errorPassword = if (intentoEnviar) validarPassword(password) else null
     val errorConfirmacion = if (intentoEnviar) validarConfirmacion(password, confirmacion) else null
-    val errorRol = if (intentoEnviar && rol == null) "Selecciona un rol" else null
 
     // la misma transformación para los dos campos de contraseña
     val transformacionPassword =
@@ -143,7 +139,7 @@ fun RegistroScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // ----- Contraseña (NUEVO) -----
+                // ----- Contraseña -----
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
@@ -169,7 +165,7 @@ fun RegistroScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // ----- Confirmar contraseña (NUEVO) -----
+                // ----- Confirmar contraseña -----
                 OutlinedTextField(
                     value = confirmacion,
                     onValueChange = { confirmacion = it },
@@ -185,59 +181,39 @@ fun RegistroScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // ----- Rol (lista desplegable) -----
-                ExposedDropdownMenuBox(
-                    expanded = menuRolAbierto,
-                    onExpandedChange = { menuRolAbierto = it }
+                // ----- Aviso del rol (NUEVO: ya no se elige) -----
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedTextField(
-                        value = rol?.etiqueta ?: "",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Rol") },
-                        placeholder = { Text("Bodega / Ventas / Admin") },
-                        isError = errorRol != null,
-                        supportingText = { if (errorRol != null) Text(errorRol) },
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuRolAbierto)
-                        },
-                        modifier = Modifier
-                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                            .fillMaxWidth()
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
                     )
-                    ExposedDropdownMenu(
-                        expanded = menuRolAbierto,
-                        onDismissRequest = { menuRolAbierto = false }
-                    ) {
-                        Rol.entries.forEach { opcion ->
-                            DropdownMenuItem(
-                                text = { Text(opcion.etiqueta) },
-                                onClick = {
-                                    rol = opcion
-                                    menuRolAbierto = false
-                                }
-                            )
-                        }
-                    }
+                    Text(
+                        text = "Tu cuenta se crea con rol Bodega. Un administrador puede cambiarlo.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
 
-                // ----- Error que viene de la base de datos -----
-                val errorBD = resultado as? ResultadoRegistro.Error
-                MensajeAnimado(mensaje = errorBD?.mensaje, esError = true)
+                // ----- Error que viene del servidor -----
+                val errorServidor = resultado as? ResultadoRegistro.Error
+                MensajeAnimado(mensaje = errorServidor?.mensaje, esError = true)
 
                 // ----- Botón Guardar -----
                 Button(
                     onClick = {
                         intentoEnviar = true
-                        val rolElegido = rol
                         val formularioValido = validarNombre(nombre) == null &&
                                 validarRut(rut) == null &&
                                 validarEmail(email) == null &&
                                 validarPassword(password) == null &&
-                                validarConfirmacion(password, confirmacion) == null &&
-                                rolElegido != null
-                        if (formularioValido && rolElegido != null) {
-                            registroViewModel.registrar(nombre, rut, email, password, rolElegido)
+                                validarConfirmacion(password, confirmacion) == null
+                        if (formularioValido) {
+                            registroViewModel.registrar(nombre, rut, email, password)
                         }
                     },
                     enabled = !isLoading,

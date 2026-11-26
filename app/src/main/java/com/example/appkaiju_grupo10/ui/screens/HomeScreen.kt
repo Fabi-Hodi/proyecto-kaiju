@@ -13,9 +13,11 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.LocalShipping
+import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.appkaiju_grupo10.model.CategoriaResumen
+import com.example.appkaiju_grupo10.model.Rol
 import com.example.appkaiju_grupo10.navigation.Screen
 import com.example.appkaiju_grupo10.ui.utils.obtenerWindowSizeClass
 import com.example.appkaiju_grupo10.viewmodels.InventarioViewModel
@@ -41,7 +44,6 @@ import com.example.appkaiju_grupo10.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 import com.example.appkaiju_grupo10.ui.components.iconoCategoria
 import androidx.compose.material.icons.filled.AddBox
-import androidx.compose.material.icons.filled.Category
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +58,10 @@ fun HomeScreen(
 
     val categorias by inventarioViewModel.categorias.collectAsState()
     var busqueda by rememberSaveable { mutableStateOf("") }
+
+    // solo el administrador ve la sección "Administración" del menú
+    val usuario by viewModel.usuarioActual.collectAsState()
+    val esAdmin = usuario?.rol == Rol.ADMIN
 
     // ADAPTABILIDAD (Guía 9): cuántas columnas según el ancho de la pantalla
     val columnas = when (windowSizeClass.widthSizeClass) {
@@ -121,6 +127,37 @@ fun HomeScreen(
                         viewModel.navigateTo(Screen.Profile)
                     }
                 )
+
+                // ----- Administración (solo ADMIN) -----
+                if (esAdmin) {
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    Text(
+                        text = "Administración",
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Usuarios") },
+                        icon = { Icon(Icons.Default.ManageAccounts, contentDescription = null) },
+                        selected = false,
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            viewModel.navigateTo(Screen.AdminUsuarios)
+                        }
+                    )
+                    // NUEVO
+                    NavigationDrawerItem(
+                        label = { Text("Productos") },
+                        icon = { Icon(Icons.Default.EditNote, contentDescription = null) },
+                        selected = false,
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            viewModel.navigateTo(Screen.AdminProductos)
+                        }
+                    )
+                }
+
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                 NavigationDrawerItem(
                     label = { Text("Cerrar sesión") },
@@ -153,7 +190,7 @@ fun HomeScreen(
                             )
                         }
                     },
-                    // barra gris del mockup (color del Paso 2)
+                    // barra superior (color del tema)
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer
                     )
@@ -230,7 +267,7 @@ fun TarjetaCategoria(categoria: CategoriaResumen, onClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // recuadro cuadrado con el ícono (el "placeholder" gris del mockup)
+            // recuadro cuadrado con el ícono
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

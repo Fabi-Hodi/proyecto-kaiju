@@ -3,6 +3,6 @@
      el resto de las conexiones (como mindicador.cl) siguen exigiendo HTTPS -->
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="false">54.205.69.58</domain>
+        <domain includeSubdomains="false">34.228.244.224</domain>
     </domain-config>
 </network-security-config>

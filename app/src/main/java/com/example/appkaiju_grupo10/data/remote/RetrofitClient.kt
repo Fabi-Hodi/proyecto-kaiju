@@ -9,7 +9,7 @@ object RetrofitClient {
 
     // IP pública del EC2 (cambia cada vez que se reinicia el laboratorio de AWS Academy).
     // Si cambia, actualizarla aquí y en res/xml/network_security_config.xml
-    private const val URL_BACKEND = "http://54.205.69.58:8080/"
+    private const val URL_BACKEND = "http://34.228.244.224:8080/"
 
     private fun crear(baseUrl: String): Retrofit =
         Retrofit.Builder()
@@ -25,5 +25,10 @@ object RetrofitClient {
     // API propia: login y registro de Kaiju (backend Spring Boot de Sonido Vivo, rama alonso/kaiju-auth)
     val kaijuAuthApi: KaijuAuthApi by lazy {
         crear(URL_BACKEND).create(KaijuAuthApi::class.java)
+    }
+
+    // API propia: administración de usuarios (solo rol ADMIN)
+    val kaijuAdminApi: KaijuAdminApi by lazy {
+        crear(URL_BACKEND).create(KaijuAdminApi::class.java)
     }
 }

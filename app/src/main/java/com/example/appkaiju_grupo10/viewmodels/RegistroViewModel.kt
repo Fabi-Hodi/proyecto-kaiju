@@ -2,7 +2,6 @@ package com.example.appkaiju_grupo10.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.appkaiju_grupo10.model.Rol
 import com.example.appkaiju_grupo10.repository.AuthException
 import com.example.appkaiju_grupo10.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +15,9 @@ sealed class ResultadoRegistro {
     data class Error(val mensaje: String) : ResultadoRegistro()
 }
 
-// Registra al operador en el backend (tabla usuario_kaiju en PostgreSQL), ya no en Room.
-// El backend valida el RUT, evita RUT/email repetidos y guarda la contraseña con BCrypt.
+// Registra al operador en el backend (tabla usuario_kaiju en PostgreSQL).
+// El backend valida el RUT, evita RUT/email repetidos, guarda la contraseña con BCrypt
+// y le asigna el rol BODEGA (solo un administrador puede cambiarlo después).
 class RegistroViewModel(
     private val repository: AuthRepository = AuthRepository()
 ) : ViewModel() {
@@ -28,7 +28,7 @@ class RegistroViewModel(
     private val _resultado = MutableStateFlow<ResultadoRegistro?>(null)
     val resultado: StateFlow<ResultadoRegistro?> = _resultado.asStateFlow()
 
-    fun registrar(nombre: String, rut: String, email: String, password: String, rol: Rol) {
+    fun registrar(nombre: String, rut: String, email: String, password: String) {
         viewModelScope.launch {
             if (_isLoading.value) return@launch
             _isLoading.value = true
@@ -39,8 +39,7 @@ class RegistroViewModel(
                     nombreCompleto = nombre,
                     rut = rut,
                     email = email,
-                    password = password,
-                    rol = rol.name                      // "BODEGA", "VENTAS" o "ADMIN"
+                    password = password
                 )
                 _resultado.value = ResultadoRegistro.Exito
             } catch (e: AuthException) {
